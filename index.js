@@ -24,6 +24,24 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+// request header parser API
+app.get("/api/whoami", function (req, res) {
+  // x-forwarded-for may contain a list of IPs if proxied; take the first one
+  const forwardedFor = req.headers["x-forwarded-for"];
+  const ipaddress = forwardedFor
+    ? forwardedFor.split(",")[0].trim()
+    : req.ip || req.connection.remoteAddress;
+
+  // accept-language header may contain multiple values; take the first
+  const acceptLanguage = req.headers["accept-language"];
+  const language = acceptLanguage ? acceptLanguage.split(",")[0] : "";
+
+  // user-agent header contains software info
+  const software = req.headers["user-agent"] || "";
+
+  res.json({ ipaddress: ipaddress, language: language, software: software });
+});
+
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
